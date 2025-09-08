@@ -7,7 +7,7 @@ const User = require('../schema/user');
 
 const JWT_SECRET = 'ThisIsSecretKey123@#';
 
-//  define the function
+//  to register
 function registerAuthRoutes(app) {
   app.post('/register', async (req, res) => {
     const { name, email, password } = req.body;
