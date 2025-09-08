@@ -2,6 +2,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../schema/user');
+const authMiddleware = require('../middleware/authmiddleware');
 
 
 
