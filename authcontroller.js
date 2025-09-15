@@ -29,19 +29,6 @@ const upload = multer ({storage});
 
 
 
-// Upload profile image
-app.post('/upload', upload.single('image'), (req, res) => {
-  if (!req.file) {
-    return res.status(400).send('No file uploaded.');
-  }
-  res.json({
-    message: 'Image uploaded successfully',
-    file: req.file
-  });
-});
-
-
-
 
 
 
@@ -111,6 +98,18 @@ res.send("Password updated by admin successfully");
   }
 
 })
+
+// Upload profile image
+app.post('/upload', upload.single('image'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).send('No file uploaded.');
+  }
+  res.json({
+    message: 'Image uploaded successfully',
+    file: req.file
+  });
+});
+
 
 }
 
