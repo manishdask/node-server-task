@@ -2,15 +2,52 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../schema/user');
-const authMiddleware = require('../middleware/authmiddleware');
+const { authmiddleware, adminmiddleware } = require('../middleware/authmiddleware');
+
+const JWT_SECRET = process.env.JWT_SECRET;
+
+const multer = require('multer');
+ 
 
 
 
-const JWT_SECRET = 'ThisIsSecretKey123@#';
 
-//  to register
+//set up multer to store file
+const storage = multer.diskStorage({
+
+  destination: (req, file,cb) =>{
+    cb(null, 'uploads/');
+  },
+
+filename: ( req, file, cb)=> {
+  const suffix= Date.now();
+  cb(null, suffix + '_' + file.originalname);
+}
+
+})
+const upload = multer ({storage});
+
+
+
+// Upload profile image
+app.post('/upload', upload.single('image'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).send('No file uploaded.');
+  }
+  res.json({
+    message: 'Image uploaded successfully',
+    file: req.file
+  });
+});
+
+
+
+
+
+
+//  define the function
 function registerAuthRoutes(app) {
-  app.post('/register', async (req, res) => {
+  app.post('/register', async (req, res) => {        //to register user
     const { name, email, password } = req.body;
 
     const existingUser = await User.findOne({ email });
@@ -49,6 +86,32 @@ function registerAuthRoutes(app) {
     await user.save();
     res.json('user updated successfully');
   });
+// admin change password
+
+app.put('/admin', async (req, res)=> {
+
+
+  const {id} = req.params;
+  const { newPassword } = req.body;
+  try {
+    const user = await User.findByID(id);
+    if (!user) return res.send ("user not found");
+    user.password = await bcrypt.hash (newPassword, 10);
+    
+// notification 
+user.notifications.push ({
+
+  message: 'Admin changed password'
+});
+
+await user.save();
+res.send("Password updated by admin successfully");
+  } catch (err) {
+    res.send ("Error updating password")
+  }
+
+})
+
 }
 
 module.exports = registerAuthRoutes;

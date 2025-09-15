@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = 'ThisIsSecretKey123@#';
+const JWT_SECRET = process.env.JWT_SECRET
 
-module.exports = (req, res, next) => {
+function authmiddleware (req,res, next) {
   const token = req.header('Authorization');
   if (!token) return res.send('No token');
 
@@ -12,3 +12,15 @@ module.exports = (req, res, next) => {
     res.send('Invalid token');
   }
 };
+ 
+// adminmiddleware
+
+function adminmiddleware (req, res, next) {
+  if ( req.user && req.user.role === "admin"){
+    next ();
+  } else {
+    res.send("Access denied. Admin only");
+  }
+}
+
+module.exports = { authmiddleware, adminmiddleware}
